@@ -6,9 +6,11 @@ import sleep from './utils/sleep';
 import { savePasscode, getPasscode } from './utils/passCodeManager';
 import Balance from './pages/Balance';
 import Order from './pages/Order';
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 async function runPuppeteer(){
     const browser = await puppeteer.launch({headless: false, slowMo: 0.25, defaultViewport: null});
