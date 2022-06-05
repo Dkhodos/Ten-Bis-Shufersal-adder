@@ -7,7 +7,6 @@ import BasePage from "./BasePage";
 
 export default class Login extends BasePage{
     private username: string;
-    private password: string;
 
     static EMAIL_INPUT = 'input[name="email"]';
     static PROCEED_TO_PASSWORD_BTN = '[data-test="login-submit"]';
@@ -21,7 +20,6 @@ export default class Login extends BasePage{
     constructor(browser: Browser, page: Page){
         super(browser, page, LOGIN_URL);
         this.username = process.env.USERNAME as string;
-        this.password = process.env.PASSWORD as string;
     }
 
     private async insertLogin(){
