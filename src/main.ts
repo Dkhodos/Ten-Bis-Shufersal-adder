@@ -1,19 +1,21 @@
-import puppeteer from 'puppeteer';
+import { Browser } from 'puppeteer';
 import 'dotenv/config'
 import express from "express";
 import Login from './pages/Login';
 import sleep from './utils/sleep';
-import { savePasscode, getPasscode } from './utils/passCodeManager';
+import { savePasscode } from './utils/passCodeManager';
 import Balance from './pages/Balance';
 import Order from './pages/Order';
 import cors from "cors";
+import MessageClient from './twilio/MessageClient';
+import getBrowser from './utils/getBrowser';
+import initChromium from './utils/initChromium';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-async function runPuppeteer(){
-    const browser = await puppeteer.launch({headless: false, slowMo: 0.25, defaultViewport: null});
+async function runPuppeteer(browser: Browser){
     const page = await browser.newPage();
 
     const login = new Login(browser, page);
@@ -33,13 +35,15 @@ async function runPuppeteer(){
 }
 
 app.post("/passcode", ( req, res ) => {
-    const passcode = req.body.passcode;
+    const passcode = req.body;
 
     savePasscode(passcode);
 
+    new MessageClient().send("Thanks!, recived " + passcode);
+
     res.json({
         status: "OK!",
-        passcode: getPasscode()
+        passcode
     });
 });
 
@@ -53,11 +57,16 @@ app.delete("/passcode",  (req, res)  => {
 });
 
 app.get("/", (req, res) => {
-    runPuppeteer().catch(e => {
-        throw new Error(e);
-    });
+    (async() => {
+        const browser = await getBrowser();
 
-    console.log("running pupetter");
+        try{
+            await runPuppeteer(browser);
+        } catch(e){
+            await browser.close();
+            throw new Error(e);
+        }
+    })()
 
     res.json({
         status: "OK!",
@@ -67,5 +76,9 @@ app.get("/", (req, res) => {
 
 const port = process.env.PORT ?? 8080;
 app.listen( port, () => {
-    console.log(`listening to  http://localhost:${port}/`)
+    console.log(`listening to http://localhost:${port}/`);
+
+    initChromium().then(version => {
+        console.log(`running ${version}/puppeteer`);
+    })
 });

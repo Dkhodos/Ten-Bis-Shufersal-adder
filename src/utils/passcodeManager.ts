@@ -1,3 +1,4 @@
+import MessageClient from "../twilio/MessageClient";
 import sleep from "./sleep";
 
 const INTERVAL = 1000;
@@ -13,6 +14,8 @@ export function getPasscode(){
 
 export async function fetchPasscode(): Promise<string>{
     let tries = TRIES;
+
+    await new MessageClient().send("Hey, You recived a passcode, may I get it :3 ?")
 
     while(tries > 0){
         const passcode = getPasscode();
