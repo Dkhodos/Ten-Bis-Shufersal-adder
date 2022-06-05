@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 
 export default async function initChromium(){
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({args:['--no-sandbox']});
 
     const page = await browser.newPage();
 

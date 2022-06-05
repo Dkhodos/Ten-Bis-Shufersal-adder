@@ -6,8 +6,12 @@ const DEV_OPTIONS: object = {
     defaultViewport: null
 }
 
+const PROD_OPTIONS : object = {
+    args: ['--no-sandbox']
+}
+
 export default async function getBrowser(){
     const isDev = process.env.NODE_ENV === "development";
 
-    return await puppeteer.launch(isDev ? DEV_OPTIONS : {});
+    return await puppeteer.launch(isDev ? DEV_OPTIONS : PROD_OPTIONS);
 }
